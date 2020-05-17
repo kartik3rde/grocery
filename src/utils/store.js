@@ -2,8 +2,11 @@ import {
   createStore, applyMiddleware, compose, combineReducers,
 } from 'redux'
 import thunk from 'redux-thunk'
+import { persistStore, persistReducer } from "redux-persist";
+import { AsyncStorage as storage } from 'react-native';
 import logger from 'redux-logger'
 import app from '../modules/app.module'
+import cart from '../modules/cart'
 
 const analytics = () => next => (action) => {
   window.dataLayer = window.dataLayer || []
@@ -15,24 +18,34 @@ const analytics = () => next => (action) => {
   return next(action)
 }
 
-// Redux store config
-const configureStore = (initialState = {}) => {
-  const reducers = combineReducers({
-    app,
-  })
-
-  // Middleware and store enhancers
-  const middlewares = [
-    thunk,
-    process.env.NODE_ENV !== 'production' && logger,
-    analytics,
-  ].filter(Boolean)
-  const enhancer = compose(applyMiddleware(...middlewares))
-  const store = createStore(reducers, initialState, enhancer)
-
-  return store
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: [
+    "cart"
+  ]
 }
+const middlewares = [
+  thunk,
+  process.env.NODE_ENV !== 'production' && logger,
+  analytics,
+].filter(Boolean)
+const allReducers = combineReducers({
+  cart,
+  app
+//   referrer: persistReducer(sessionRedConfig, referrer)
+});
+const enhancer = compose(applyMiddleware(...middlewares))
+const persistedReducer = persistReducer(persistConfig, allReducers);
 
-const store = configureStore()
+export default () => {
+  let store = createStore(
+    persistedReducer,
+  //   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+    undefined,
+    enhancer
+  );
+  let persistor = persistStore(store);
+  return { store, persistor };
+};
 
-export default store

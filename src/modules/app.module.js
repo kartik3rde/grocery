@@ -8,7 +8,7 @@ const Log_ME ="Log_ME"
 
 const initialState = {
   checked: false,
-  loggedIn: false,
+  loggedIn: true || false,
   me: {},
 }
 

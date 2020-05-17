@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Image, Modal, Picker, Dimensions } from 'react-native'
 import Button from '../../components/Button'
+import { connect } from 'react-redux'
 import { colors, images } from '../../styles'
 import FontIcon from 'react-native-vector-icons/FontAwesome5'
+import { addToCart } from '../../modules/cart'
 const screenWidth = Math.round(Dimensions.get('window').width);
 const styles = StyleSheet.create({
     wrapper: {
@@ -116,6 +118,13 @@ class SingleProduct extends Component {
             modalVisible: false
         }
     }
+    _addToCart = () => {
+        this.props.addToCart({
+            ...this.props.productData,
+            qty: this.state.selectValue
+        })
+        this.setModalVisible(true)
+    }
     _changeState(type) {
         const { openModal } = this.state
         this.setState({ openModal: !openModal })
@@ -136,7 +145,6 @@ class SingleProduct extends Component {
         let variantList = productData.variations
         variantList = variantList && variantList.length > 0 ? JSON.parse(variantList) : []
 
-        console.log(productData)
         return (
             <View style={styles.wrapper}>
                 <View style={styles.singleProduct} onStartShouldSetResponder={() => this._changeState()}>
@@ -192,7 +200,7 @@ class SingleProduct extends Component {
                             </Picker>
                         </View>
                         <Button
-                            onPress={() => { this.setModalVisible(true) }}
+                            onPress={this._addToCart}
                             title={<><Text>{selectValue}</Text><FontIcon
                                 name="cart-plus"
                                 style={styles.addTocartIcon}
@@ -231,4 +239,6 @@ SingleProduct.defaultProps = {
     navigation: {},
 }
 
-export default SingleProduct
+export default connect(null, {
+    addToCart
+})(SingleProduct)

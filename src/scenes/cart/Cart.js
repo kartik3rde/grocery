@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { StyleSheet, Text, View, Image, SafeAreaView, ScrollView } from 'react-native'
 import Button from '../../components/Button'
 import { colors, images } from '../../styles'
@@ -170,8 +171,14 @@ class Cart extends Component {
             <View style={styles.container}>
                 <SafeAreaView style={styles.scrollWRapper}>
                     <ScrollView style={styles.scrollView}>
-                        {
+                        {/* {
                             product.map((itm, index) =>
+                                this._singleProductView(itm)
+
+                            )
+                        } */}
+                        {
+                            this.props.cart.items.map((itm, index) =>
                                 this._singleProductView(itm)
 
                             )
@@ -186,7 +193,10 @@ class Cart extends Component {
                     </View>
                     <Button
                                 onPress={() => {
-                                    navigation.navigate('Details', { from: 'Profile' })
+                                    console.log({
+                                        props: this.props
+                                    })
+                                    // navigation.navigate('Details', { from: 'Profile' })
                                   }}
                                 title="Checkout"
                                 style={styles.addToCart}
@@ -209,5 +219,10 @@ Cart.propTypes = {
 Cart.defaultProps = {
     navigation: {},
 }
+const mapStateToProps = state => ({
+    cart: state.cart
+})
+const mapDispatchToProps = {
 
-export default Cart
+}
+export default connect(mapStateToProps, mapDispatchToProps )(Cart)
